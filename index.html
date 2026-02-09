@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake Mouse Effect</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: #0a0a0a;
+        color: #ffffff;
+        font-family: 'Arial', sans-serif;
+        overflow: hidden;
+        cursor: none;
+    }
+
+    .content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-size: 3rem;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    #snake-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+    }
+
+    .segment {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, #7fff00, #32cd32);
+        box-shadow: 0 0 10px #7fff00, 0 0 20px #32cd32;
+        transform: translate(-50%, -50%);
+    }
+
+</style>
+</head>
+<body>
+
+    <div class="content">
+        <div>
+            <h1>Move Your Mouse</h1>
+            <p>The snake is following you...</p>
+        </div>
+    </div>
+
+    <div id="snake-container"></div>
+
+<script>
+    const snakeContainer = document.getElementById('snake-container');
+    const NUM_SEGMENTS = 25;
+    const SEGMENT_SIZE = 20;
+    const SPEED = 0.15;
+
+    let segments = [];
+    let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+    for (let i = 0; i < NUM_SEGMENTS; i++) {
+        const segment = document.createElement('div');
+        segment.classList.add('segment');
+        
+        const size = i === 0 ? SEGMENT_SIZE : SEGMENT_SIZE * (1 - i / NUM_SEGMENTS);
+        segment.style.width = `${size}px`;
+        segment.style.height = `${size}px`;
+        
+        if (i === 0) {
+            segment.style.background = 'radial-gradient(circle, #ff4500, #dc143c)';
+            segment.style.boxShadow = '0 0 15px #ff4500, 0 0 30px #dc143c';
+        }
+        
+        snakeContainer.appendChild(segment);
+        segments.push({
+            element: segment,
+            x: mousePos.x,
+            y: mousePos.y
+        });
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        mousePos.x = e.clientX;
+        mousePos.y = e.clientY;
+    });
+
+    function animate() {
+        segments[0].x += (mousePos.x - segments[0].x) * SPEED;
+        segments[0].y += (mousePos.y - segments[0].y) * SPEED;
+
+        for (let i = 1; i < segments.length; i++) {
+            const prevSegment = segments[i - 1];
+            const currentSegment = segments[i];
+
+            currentSegment.x += (prevSegment.x - currentSegment.x) * SPEED;
+            currentSegment.y += (prevSegment.y - currentSegment.y) * SPEED;
+        }
+
+        segments.forEach(segment => {
+            segment.element.style.left = `${segment.x}px`;
+            segment.element.style.top = `${segment.y}px`;
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+</script>
+
+</body>
+</html>
