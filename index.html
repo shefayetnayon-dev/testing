@@ -1,122 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snake Mouse Effect</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Animated Mega Dropdown Menu</title>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+  :root {
+    --bg: #070b1a;
+    --panel: rgba(20, 27, 54, 0.8);
+    --panel-strong: rgba(15, 22, 46, 0.95);
+    --line: rgba(255, 255, 255, 0.12);
+    --text: #f5f7ff;
+    --muted: #95a0c8;
+    --accent: #6f8bff;
+    --accent-2: #41d8c9;
+    --shadow: 0 22px 55px rgba(3, 7, 20, 0.55);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 10% 15%, rgba(65, 216, 201, 0.2), transparent 36%),
+      radial-gradient(circle at 88% 5%, rgba(111, 139, 255, 0.3), transparent 40%),
+      linear-gradient(130deg, #060913 10%, #0b1430 50%, #12152b 100%);
+    padding: 30px;
+  }
+
+  .header {
+    max-width: 1140px;
+    margin: 0 auto;
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: visible;
+  }
+
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    gap: 18px;
+  }
+
+  .brand {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .menu {
+    display: flex;
+    list-style: none;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .menu-item {
+    position: relative;
+  }
+
+  .menu-button,
+  .menu-link {
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+
+  .menu-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .menu-button .caret {
+    width: 9px;
+    height: 9px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg);
+    transition: transform 0.35s cubic-bezier(.22, 1, .36, 1), border-color 0.25s ease;
+  }
+
+  .menu-link:hover,
+  .menu-button:hover,
+  .menu-button[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .menu-button[aria-expanded="true"] .caret {
+    transform: rotate(-135deg) translateY(-1px);
+    border-color: var(--accent-2);
+  }
+
+  .mega-menu {
+    position: absolute;
+    top: calc(100% + 15px);
+    left: 0;
+    width: min(880px, calc(100vw - 70px));
+    background: linear-gradient(160deg, rgba(16, 24, 50, 0.98), rgba(11, 18, 38, 0.98));
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 22px;
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(14px) scale(0.97);
+    filter: blur(7px);
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+
+    transition:
+      opacity 0.35s cubic-bezier(.22, 1, .36, 1),
+      transform 0.35s cubic-bezier(.22, 1, .36, 1),
+      filter 0.35s cubic-bezier(.22, 1, .36, 1);
+    z-index: 50;
+  }
+
+  .menu-item.open .mega-menu {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+
+  .section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 16px;
+    transform: translateY(8px);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(.2, .75, .2, 1), opacity 0.45s ease;
+  }
+
+  .menu-item.open .section {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .menu-item.open .section:nth-child(1) { transition-delay: 40ms; }
+  .menu-item.open .section:nth-child(2) { transition-delay: 100ms; }
+  .menu-item.open .section:nth-child(3) { transition-delay: 160ms; }
+
+  .section h3 {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    color: #dce4ff;
+  }
+
+  .section a {
+    display: block;
+    text-decoration: none;
+    color: var(--muted);
+    padding: 7px 8px;
+    border-radius: 8px;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+
+  .section a:hover {
+    color: #fff;
+    background: rgba(111, 139, 255, 0.15);
+    transform: translateX(3px);
+  }
+
+  .hero {
+    max-width: 1140px;
+    margin: 80px auto 0;
+    text-align: center;
+    color: #d8deff;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    margin-bottom: 12px;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+
+  @media (max-width: 940px) {
+    .navbar {
+      flex-wrap: wrap;
     }
 
-    body {
-        background-color: #0a0a0a;
-        color: #ffffff;
-        font-family: 'Arial', sans-serif;
-        overflow: hidden;
-        cursor: none;
+    .menu {
+      width: 100%;
+      flex-wrap: wrap;
     }
 
-    .content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        font-size: 3rem;
-        text-align: center;
-        pointer-events: none;
+    .mega-menu {
+      width: min(94vw, 720px);
+      grid-template-columns: 1fr;
+      left: 0;
     }
+  }
 
-    #snake-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
     }
-
-    .segment {
-        position: absolute;
-        border-radius: 50%;
-        background: radial-gradient(circle, #7fff00, #32cd32);
-        box-shadow: 0 0 10px #7fff00, 0 0 20px #32cd32;
-        transform: translate(-50%, -50%);
-    }
-
+  }
 </style>
 </head>
 <body>
+  <header class="header">
+    <nav class="navbar" aria-label="Main navigation">
+      <a href="#" class="brand">NOVA UI</a>
 
-    <div class="content">
-        <div>
-            <h1>Move Your Mouse</h1>
-            <p>The snake is following you...</p>
-        </div>
-    </div>
+      <ul class="menu">
+        <li class="menu-item" id="products-item">
+          <button class="menu-button" id="products-btn" aria-haspopup="true" aria-expanded="false" aria-controls="products-menu">
+            Products <span class="caret" aria-hidden="true"></span>
+          </button>
 
-    <div id="snake-container"></div>
+          <div class="mega-menu" id="products-menu" role="menu" aria-labelledby="products-btn">
+            <section class="section">
+              <h3>Design</h3>
+              <a href="#">UI Kit</a>
+              <a href="#">Icon Packs</a>
+              <a href="#">Wireframes</a>
+              <a href="#">Theme Builder</a>
+            </section>
+            <section class="section">
+              <h3>Development</h3>
+              <a href="#">Component Library</a>
+              <a href="#">CLI Tools</a>
+              <a href="#">API Studio</a>
+              <a href="#">Performance Kit</a>
+            </section>
+            <section class="section">
+              <h3>Growth</h3>
+              <a href="#">A/B Testing</a>
+              <a href="#">Session Replay</a>
+              <a href="#">Conversion Insights</a>
+              <a href="#">Audience Segments</a>
+            </section>
+          </div>
+        </li>
+
+        <li class="menu-item"><a class="menu-link" href="#">Pricing</a></li>
+        <li class="menu-item"><a class="menu-link" href="#">Customers</a></li>
+        <li class="menu-item"><a class="menu-link" href="#">Docs</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <h1>Smooth Animated Mega Dropdown</h1>
+    <p>Hover, click, and tab into the menu to experience intelligent and fluid motion.</p>
+  </main>
 
 <script>
-    const snakeContainer = document.getElementById('snake-container');
-    const NUM_SEGMENTS = 25;
-    const SEGMENT_SIZE = 20;
-    const SPEED = 0.15;
+  const menuItem = document.getElementById('products-item');
+  const button = document.getElementById('products-btn');
 
-    let segments = [];
-    let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  const openMenu = () => {
+    menuItem.classList.add('open');
+    button.setAttribute('aria-expanded', 'true');
+  };
 
-    for (let i = 0; i < NUM_SEGMENTS; i++) {
-        const segment = document.createElement('div');
-        segment.classList.add('segment');
-        
-        const size = i === 0 ? SEGMENT_SIZE : SEGMENT_SIZE * (1 - i / NUM_SEGMENTS);
-        segment.style.width = `${size}px`;
-        segment.style.height = `${size}px`;
-        
-        if (i === 0) {
-            segment.style.background = 'radial-gradient(circle, #ff4500, #dc143c)';
-            segment.style.boxShadow = '0 0 15px #ff4500, 0 0 30px #dc143c';
-        }
-        
-        snakeContainer.appendChild(segment);
-        segments.push({
-            element: segment,
-            x: mousePos.x,
-            y: mousePos.y
-        });
+  const closeMenu = () => {
+    menuItem.classList.remove('open');
+    button.setAttribute('aria-expanded', 'false');
+  };
+
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (menuItem.classList.contains('open')) {
+      closeMenu();
+    } else {
+      openMenu();
     }
+  });
 
-    document.addEventListener('mousemove', (e) => {
-        mousePos.x = e.clientX;
-        mousePos.y = e.clientY;
-    });
+  menuItem.addEventListener('mouseenter', openMenu);
+  menuItem.addEventListener('mouseleave', closeMenu);
 
-    function animate() {
-        segments[0].x += (mousePos.x - segments[0].x) * SPEED;
-        segments[0].y += (mousePos.y - segments[0].y) * SPEED;
-
-        for (let i = 1; i < segments.length; i++) {
-            const prevSegment = segments[i - 1];
-            const currentSegment = segments[i];
-
-            currentSegment.x += (prevSegment.x - currentSegment.x) * SPEED;
-            currentSegment.y += (prevSegment.y - currentSegment.y) * SPEED;
-        }
-
-        segments.forEach(segment => {
-            segment.element.style.left = `${segment.x}px`;
-            segment.element.style.top = `${segment.y}px`;
-        });
-
-        requestAnimationFrame(animate);
+  document.addEventListener('click', (event) => {
+    if (!menuItem.contains(event.target)) {
+      closeMenu();
     }
+  });
 
-    animate();
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeMenu();
+      button.focus();
+    }
+  });
 </script>
-
 </body>
 </html>
