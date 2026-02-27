@@ -1,122 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snake Mouse Effect</title>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Interactive Terminal Portfolio</title>
+  <style>
+    :root {
+      --bg: #05070f;
+      --panel: rgba(14, 18, 32, 0.85);
+      --border: rgba(120, 170, 255, 0.35);
+      --text: #dce7ff;
+      --accent: #6ee7ff;
+      --accent-2: #a78bfa;
+      --ok: #86efac;
+      --error: #fda4af;
     }
+
+    * { box-sizing: border-box; }
 
     body {
-        background-color: #0a0a0a;
-        color: #ffffff;
-        font-family: 'Arial', sans-serif;
-        overflow: hidden;
-        cursor: none;
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at 20% 10%, #121c3f 0%, #05070f 45%, #02030a 100%);
+      color: var(--text);
+      overflow-x: hidden;
     }
 
-    .content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        font-size: 3rem;
-        text-align: center;
-        pointer-events: none;
+    .aurora {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(50rem 50rem at 10% 90%, rgba(80, 140, 255, 0.22), transparent 60%),
+        radial-gradient(40rem 40rem at 90% 20%, rgba(180, 80, 255, 0.2), transparent 60%);
+      filter: blur(8px);
+      z-index: 0;
     }
 
-    #snake-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 18px 42px;
     }
 
-    .segment {
-        position: absolute;
-        border-radius: 50%;
-        background: radial-gradient(circle, #7fff00, #32cd32);
-        box-shadow: 0 0 10px #7fff00, 0 0 20px #429142;
-        transform: translate(-50%, -50%);
+    .hero {
+      text-align: center;
+      margin-bottom: 24px;
     }
 
-</style>
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3.2vw, 3rem);
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 32px rgba(90, 180, 255, 0.35);
+    }
+
+    .hero p {
+      margin: 10px auto 0;
+      max-width: 780px;
+      color: #b7c5ea;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr 1.25fr;
+      }
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    .portfolio {
+      padding: 20px;
+      perspective: 1100px;
+      transform-style: preserve-3d;
+    }
+
+    .portfolio h2,
+    .terminal h2 {
+      margin: 0 0 16px;
+      font-size: 1.1rem;
+      color: #dff2ff;
+    }
+
+    .cards {
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border-radius: 14px;
+      border: 1px solid rgba(150, 192, 255, 0.3);
+      padding: 14px;
+      background: linear-gradient(165deg, rgba(22, 30, 56, 0.96), rgba(10, 13, 24, 0.96));
+      transition: transform 150ms ease, border-color 150ms ease;
+      transform-style: preserve-3d;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: #ecf6ff;
+    }
+
+    .card p {
+      margin: 8px 0 10px;
+      font-size: 0.93rem;
+      color: #bdcaec;
+      line-height: 1.4;
+    }
+
+    .stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      border: 1px solid rgba(165, 199, 255, 0.4);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      color: #dce8ff;
+      background: rgba(27, 38, 76, 0.65);
+    }
+
+    .terminal {
+      padding: 20px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    select,
+    button {
+      border-radius: 8px;
+      border: 1px solid rgba(150, 190, 255, 0.4);
+      background: rgba(12, 18, 36, 0.92);
+      color: var(--text);
+      font: inherit;
+      padding: 8px 12px;
+    }
+
+    button {
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(146, 226, 255, 0.8);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      border-radius: 10px;
+      border: 1px solid rgba(150, 190, 255, 0.35);
+      background: #070b17;
+      color: #d4f0ff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      padding: 12px;
+      resize: vertical;
+    }
+
+    .console {
+      background: #040812;
+      border: 1px solid rgba(148, 185, 250, 0.3);
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 150px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow: auto;
+      font-size: 0.85rem;
+    }
+
+    .line {
+      margin: 3px 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .line.ok { color: var(--ok); }
+    .line.error { color: var(--error); }
+    .line.info { color: #bfdbfe; }
+
+    iframe {
+      width: 100%;
+      min-height: 120px;
+      border-radius: 10px;
+      border: 1px solid rgba(149, 184, 255, 0.35);
+      background: #fff;
+    }
+  </style>
 </head>
 <body>
+  <div class="aurora" aria-hidden="true"></div>
+  <main class="app">
+    <header class="hero">
+      <h1>3D Interactive Terminal Portfolio</h1>
+      <p>
+        Hover the project cards to explore a pseudo-3D portfolio, then execute real JavaScript snippets inside a sandboxed live terminal.
+      </p>
+    </header>
 
-    <div class="content">
-        <div>
-            <h1>Move Your Mouse</h1>
-            <p>The snake is following you...</p>
+    <section class="grid">
+      <article class="panel portfolio" id="portfolio3d">
+        <h2>Featured Projects</h2>
+        <div class="cards">
+          <section class="card">
+            <h3>Realtime Market Radar</h3>
+            <p>Streaming dashboard with anomaly detection and portfolio heatmaps for high-frequency data.</p>
+            <div class="stack">
+              <span class="tag">WebSockets</span>
+              <span class="tag">D3.js</span>
+              <span class="tag">Node</span>
+            </div>
+          </section>
+          <section class="card">
+            <h3>AI Resume Coach</h3>
+            <p>Context-aware feedback engine that scores CVs and suggests role-specific improvements.</p>
+            <div class="stack">
+              <span class="tag">LLM API</span>
+              <span class="tag">TypeScript</span>
+              <span class="tag">Cloud Run</span>
+            </div>
+          </section>
+          <section class="card">
+            <h3>Micro-SaaS Billing Core</h3>
+            <p>Subscription lifecycle system with automated dunning, retries, and usage-based invoicing.</p>
+            <div class="stack">
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">Stripe</span>
+              <span class="tag">Go</span>
+            </div>
+          </section>
         </div>
-    </div>
+      </article>
 
-    <div id="snake-container"></div>
+      <article class="panel terminal">
+        <h2>Live Code Terminal</h2>
+        <div class="toolbar">
+          <label for="snippetPicker">Snippet:</label>
+          <select id="snippetPicker"></select>
+          <button id="runBtn">Run Snippet</button>
+          <button id="clearBtn">Clear Output</button>
+        </div>
+        <textarea id="codeEditor" spellcheck="false" aria-label="Code editor"></textarea>
+        <div class="console" id="terminalOutput" aria-live="polite"></div>
+        <iframe id="preview" sandbox="allow-scripts" title="Live preview"></iframe>
+      </article>
+    </section>
+  </main>
 
-<script>
-    const snakeContainer = document.getElementById('snake-container');
-    const NUM_SEGMENTS = 25;
-    const SEGMENT_SIZE = 20;
-    const SPEED = 0.15;
+  <script>
+    const portfolio = document.getElementById('portfolio3d');
+    const cards = Array.from(document.querySelectorAll('.card'));
 
-    let segments = [];
-    let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    portfolio.addEventListener('mousemove', (event) => {
+      const rect = portfolio.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const rotateY = ((x / rect.width) - 0.5) * 12;
+      const rotateX = (0.5 - (y / rect.height)) * 10;
+      portfolio.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 
-    for (let i = 0; i < NUM_SEGMENTS; i++) {
-        const segment = document.createElement('div');
-        segment.classList.add('segment');
-        
-        const size = i === 0 ? SEGMENT_SIZE : SEGMENT_SIZE * (1 - i / NUM_SEGMENTS);
-        segment.style.width = `${size}px`;
-        segment.style.height = `${size}px`;
-        
-        if (i === 0) {
-            segment.style.background = 'radial-gradient(circle, #ff4500, #dc143c)';
-            segment.style.boxShadow = '0 0 15px #ff4500, 0 0 30px #dc143c';
-        }
-        
-        snakeContainer.appendChild(segment);
-        segments.push({
-            element: segment,
-            x: mousePos.x,
-            y: mousePos.y
-        });
-    }
-
-    document.addEventListener('mousemove', (e) => {
-        mousePos.x = e.clientX;
-        mousePos.y = e.clientY;
+      cards.forEach((card, index) => {
+        const depth = 18 + (index * 6);
+        card.style.transform = `translateZ(${depth}px)`;
+      });
     });
 
-    function animate() {
-        segments[0].x += (mousePos.x - segments[0].x) * SPEED;
-        segments[0].y += (mousePos.y - segments[0].y) * SPEED;
+    portfolio.addEventListener('mouseleave', () => {
+      portfolio.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      cards.forEach(card => {
+        card.style.transform = 'translateZ(0px)';
+      });
+    });
 
-        for (let i = 1; i < segments.length; i++) {
-            const prevSegment = segments[i - 1];
-            const currentSegment = segments[i];
+    const snippets = {
+      'FizzBuzz to 30': `for (let i = 1; i <= 30; i++) {
+  const out = (i % 3 === 0 ? 'Fizz' : '') + (i % 5 === 0 ? 'Buzz' : '');
+  console.log(out || i);
+}`,
+      'Generate Gradient Stops': `const colors = ['#3b82f6', '#8b5cf6', '#14b8a6'];
+const stops = colors.map((color, i) => ({ color, pct: Math.round((i / (colors.length - 1)) * 100) }));
+console.log('CSS:', 'linear-gradient(90deg, ' + stops.map(s => s.color + ' ' + s.pct + '%').join(', ') + ')');
+console.table(stops);`,
+      'Render Mini Chart': `const points = [9, 13, 7, 15, 11, 18, 12];
+const max = Math.max(...points);
+const bars = points.map(value => '▇'.repeat(Math.round((value / max) * 20)));
+bars.forEach((bar, i) => console.log(String(i + 1).padStart(2, '0') + ': ' + bar));`
+    };
 
-            currentSegment.x += (prevSegment.x - currentSegment.x) * SPEED;
-            currentSegment.y += (prevSegment.y - currentSegment.y) * SPEED;
-        }
+    const snippetPicker = document.getElementById('snippetPicker');
+    const codeEditor = document.getElementById('codeEditor');
+    const terminalOutput = document.getElementById('terminalOutput');
+    const preview = document.getElementById('preview');
 
-        segments.forEach(segment => {
-            segment.element.style.left = `${segment.x}px`;
-            segment.element.style.top = `${segment.y}px`;
-        });
-
-        requestAnimationFrame(animate);
+    function printLine(text, type = 'info') {
+      const line = document.createElement('div');
+      line.className = `line ${type}`;
+      line.textContent = text;
+      terminalOutput.appendChild(line);
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
     }
 
-    animate();
-</script>
+    function loadSnippets() {
+      Object.keys(snippets).forEach((name, idx) => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        if (idx === 0) option.selected = true;
+        snippetPicker.appendChild(option);
+      });
+      codeEditor.value = snippets[snippetPicker.value];
+    }
 
+    function runCode() {
+      terminalOutput.innerHTML = '';
+      printLine('> Running snippet in sandboxed iframe...', 'ok');
+
+      const source = codeEditor.value;
+      const escaped = source.replace(/<\/script>/g, '<\\/script>');
+
+      preview.srcdoc = `<!DOCTYPE html>
+<html><body><script>
+window.onerror = function(msg){
+  parent.postMessage({ type: 'error', payload: String(msg) }, '*');
+};
+const consoleProxy = {
+  log: (...args) => parent.postMessage({ type: 'log', payload: args.map(String).join(' ') }, '*'),
+  table: (obj) => parent.postMessage({ type: 'log', payload: JSON.stringify(obj, null, 2) }, '*')
+};
+try {
+  const console = consoleProxy;
+  ${escaped}
+  parent.postMessage({ type: 'done', payload: 'Execution complete.' }, '*');
+} catch (err) {
+  parent.postMessage({ type: 'error', payload: err.message }, '*');
+}
+<\/script></body></html>`;
+    }
+
+    window.addEventListener('message', (event) => {
+      if (event.source !== preview.contentWindow || !event.data) return;
+      const { type, payload } = event.data;
+      if (type === 'log') printLine(payload, 'info');
+      if (type === 'done') printLine(payload, 'ok');
+      if (type === 'error') printLine(payload, 'error');
+    });
+
+    snippetPicker.addEventListener('change', () => {
+      codeEditor.value = snippets[snippetPicker.value];
+    });
+
+    document.getElementById('runBtn').addEventListener('click', runCode);
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      terminalOutput.innerHTML = '';
+      preview.srcdoc = '<!DOCTYPE html><html><body></body></html>';
+    });
+
+    loadSnippets();
+    runCode();
+  </script>
 </body>
 </html>
